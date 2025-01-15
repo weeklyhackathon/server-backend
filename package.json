@@ -5,7 +5,8 @@
   "description": "Auth backend for Weeklyhackathon Live",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsc && node --env-file=.env.development dist/index.js"
   },
   "author": "moon.eth",
   "license": "MIT",
