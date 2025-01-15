@@ -94,17 +94,33 @@ const hasEnoughHackathonTokens = async (addresses: Set<`0x${string}`>) => {
 
 console.log("Minimum token requirement:", minTokenRequirement);
 
-app.post('/api/revalidate', async (req: Request, res: Response) => {
-    const jwk = req.body?.id;
+app.post('/api/webhook', async (req: Request, res: Response) => {
+    console.log("Webhook request:", req.body);
+    return res.status(200).json({
+        success: true,
+        message: 'Webhook received'
+    } as ResponseBody);
+});
 
-    if (typeof jwk !== 'string') {
+app.post('/api/revalidate', async (req: Request, res: Response) => {
+    console.log("Revalidate request:", req.body);
+    const jwt = req.body?.jwt;
+
+    if (typeof jwt !== 'string') {
+        console.log('Invalid POST body, rejecting', typeof jwt);
         return res.status(400).json({
             success: false,
-            message: 'Invalid jwk'
+            message: 'Invalid jwt'
         } as ResponseBody);
     }
 
-    const token = getToken(jwk);
+    const token = getToken(jwt);
+
+    const now = Math.floor(Date.now() / 1000);
+
+    const expired = token ? (token.expires_at < now ? "yes" : "no") : "unset";
+
+    console.log(`Revalidate: exists? ${!!token}, expired? ${expired}`);
 
     if (!token || token.expires_at < Math.floor(Date.now() / 1000)) {
         return res.status(400).json({
